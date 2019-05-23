@@ -2,6 +2,12 @@
 # Created by https://www.gitignore.io/api/node,angular,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=node,angular,visualstudiocode
 
+# Images created locally by the server
+backend/images/
+
+# jwt and mongodb secrets
+nodemon.json
+
 ### Angular ###
 ## Angular ##
 # compiled output
