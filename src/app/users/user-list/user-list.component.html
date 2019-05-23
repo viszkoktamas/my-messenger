@@ -1,0 +1,37 @@
+<div>
+  <input
+    matInput
+    placeholder="Search user by name"
+    [(ngModel)]="filter"
+    (change)="onFilterChanged()"
+    type="text"
+  />
+</div>
+
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+<div *ngIf="!isLoading">
+  <mat-list *ngIf="users.length > 0">
+    <mat-list-item matLine *ngFor="let user of users">
+      <img matListAvatar [src]="user.imagePath" [alt]="user.name" />
+      <p matLine>
+        <span> {{ user.name }} </span>
+        <span class="demo-2"> -- {{ user.city }} </span>
+      </p>
+      <p matLine>
+        <span>
+          <button mat-button (click)="onStartConversation(user.id)">Start Conversation</button>
+        </span>
+      </p>
+    </mat-list-item>
+  </mat-list>
+  <p class="info-text mat-body-1" *ngIf="users.length <= 0">
+    No users found!
+  </p>
+</div>
+
+<mat-paginator
+  [length]="totalUsers"
+  [pageSize]="usersPerPage"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onChangedPage($event)"
+></mat-paginator>

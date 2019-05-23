@@ -46,7 +46,12 @@ exports.userLogin = (req, res) => {
         });
       }
       const token = jwt.sign(
-        { email: fetchedUser.email, userId: fetchedUser._id },
+        {
+          email: fetchedUser.email,
+          userId: fetchedUser._id,
+          name: fetchedUser.name,
+          imagePath: fetchedUser.imagePath,
+        },
         process.env.JWT_KEY,
         { expiresIn: '1h' }
       );
@@ -59,44 +64,15 @@ exports.userLogin = (req, res) => {
     });
 };
 
-exports.editUser = (req, res) => {
-  let imagePath = req.body.imagePath;
-  if (req.file) {
-    const url = req.protocol + '://' + req.get('host');
-    imagePath = url + '/images/' + req.file.filename;
-  }
-  const user = new User({
-    _id: req.userData.userId,
-    email: req.body.email,
-    password: req.body.password,
-    imagePath,
-    name: req.body.name,
-    city: req.body.city,
-  });
-  User.updateOne({ _id: req.userData.userId }, user)
-    .then(result => {
-      if (result.n > 0) {
-        res.status(200).json({ message: 'Update succesfull!' });
-      } else {
-        res.status(401).json({ message: 'Not authorized!' });
-      }
-    })
-    .catch(error => {
-      res.status(500).json({ message: error.message });
-    });
-};
-
 exports.getUsersByName = (req, res) => {
   const pageSize = +req.query.page_size;
   const currentPage = +req.query.page;
   const name = req.query.name;
-
-  if (!name) {
-    return res.status(403).json({ message: 'User id is required!' });
-  }
-
   let fetchedUsers;
-  const userQuery = User.find({ name: { '$regex:': name, $options: 'i' } });
+  let userQuery = User.find({
+    _id: { $ne: req.userData.userId },
+    name: { $regex: name, $options: 'i' },
+  });
 
   if (pageSize && currentPage) {
     userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
@@ -105,12 +81,20 @@ exports.getUsersByName = (req, res) => {
   userQuery
     .then(users => {
       fetchedUsers = users;
-      return User.count();
+      return User.countDocuments({
+        _id: { $ne: req.userData.userId },
+        name: { $regex: name, $options: 'i' },
+      });
     })
     .then(count => {
       res.status(200).json({
         message: 'Users fetched succesfully!',
-        users: fetchedUsers,
+        users: fetchedUsers.map(fetchedUser => ({
+          id: fetchedUser._id,
+          name: fetchedUser.name,
+          city: fetchedUser.city,
+          imagePath: fetchedUser.imagePath,
+        })),
         maxUsers: count,
       });
     })
@@ -123,7 +107,12 @@ exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .then(user => {
       if (user) {
-        res.status(200).json(user);
+        res.status(200).json({
+          id: user._id,
+          name: user.name,
+          city: user.city,
+          imagePath: user.imagePath,
+        });
       } else {
         res.status(404).json({ message: 'User not found!' });
       }

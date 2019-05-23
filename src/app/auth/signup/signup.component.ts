@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { mimeType } from './mime-type.validator';
 
 @Component({
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.css']
+  styleUrls: ['./signup.component.css'],
 })
 export class SignupComponent implements OnInit, OnDestroy {
   isLoading = false;
@@ -15,30 +16,29 @@ export class SignupComponent implements OnInit, OnDestroy {
   triedToSubmit = false;
   private authStatusSub: Subscription;
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, public route: ActivatedRoute) {}
 
   ngOnInit() {
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(authStatus => {
       this.isLoading = false;
     });
-
     this.form = new FormGroup({
       email: new FormControl(null, {
-        validators: [Validators.email, Validators.required]
+        validators: [Validators.email, Validators.required],
       }),
       password: new FormControl(null, {
-        validators: [Validators.minLength(3), Validators.required]
+        validators: [Validators.minLength(3), Validators.required],
       }),
       image: new FormControl(null, {
         validators: [Validators.required],
-        asyncValidators: [mimeType]
+        asyncValidators: [mimeType],
       }),
       name: new FormControl(null, {
-        validators: [Validators.minLength(3), Validators.required]
+        validators: [Validators.minLength(3), Validators.required],
       }),
       city: new FormControl(null, {
-        validators: [Validators.minLength(3), Validators.required]
-      })
+        validators: [Validators.minLength(3), Validators.required],
+      }),
     });
   }
 

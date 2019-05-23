@@ -1,14 +1,20 @@
 <mat-card>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <form [formGroup]="form" (submit)="onLogin()" *ngIf="!isLoading">
+    <!-- #region email field -->
     <mat-form-field>
       <input matInput type="email" formControlName="email" placeholder="email" />
       <mat-error *ngIf="form.get('email').invalid">Please enter a valid email.</mat-error>
     </mat-form-field>
+    <!-- #endregion -->
+    <!-- #region password field -->
     <mat-form-field>
       <input matInput type="password" formControlName="password" placeholder="password" />
       <mat-error *ngIf="form.get('password').invalid">Please enter a valid password.</mat-error>
     </mat-form-field>
+    <!-- #endregion -->
+    <!-- #region login button -->
     <button mat-raised-button color="accent" type="submit">Login</button>
+    <!-- #endregion -->
   </form>
 </mat-card>
